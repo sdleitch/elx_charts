@@ -85,7 +85,9 @@ g <- ggplot(data=data.frame(), aes(
     scale_y_continuous(labels = comma) +
     scale_fill_discrete(NULL) +
     theme_map() +
-    ylab("Votes")
+    labs(
+      y="Votes",
+      caption="Scott Leitch, @leitchsd, 2017.")
 
 chartResults <- function(chart) {
   # 2013 Edmonton Election results API: https://data.edmonton.ca/resource/ee98-x4ib
@@ -107,8 +109,7 @@ chartResults <- function(chart) {
           dlply(.(race_id), function(x) {
             g <- chart + labs(
               title=paste(x$contest, "-", x$ward_name),
-              caption=x$reported_at,
-              subtitle=paste(x$reporting, "of", x$out_of, "polls reporting")
+              subtitle=paste(x$reporting, "of", x$out_of, "polls reporting as of", as.character(x$reported_at, "%I:%M %p."))
             )
             g %+% x
           })

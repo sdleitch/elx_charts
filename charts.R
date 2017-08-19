@@ -82,13 +82,13 @@ theme_map <- function(...) {
   )
 }
 
-  g <- ggplot() +
-      scale_y_continuous(labels=comma) +
-      scale_fill_manual(NULL, values=brewer.pal(8, "Set2")) +
-      theme_map() +
-      labs(
-        y="Votes",
-        caption="A maximum of eight candidates are shown.\n\nScott Leitch, @leitchsd, 2017.")
+g <- ggplot() +
+    scale_y_continuous(labels=comma) +
+    scale_fill_manual(NULL, values=brewer.pal(8, "Set2")) +
+    theme_map() +
+    labs(
+      y="Votes",
+      caption="A maximum of eight candidates are shown.\n\nScott Leitch, @leitchsd, 2017.")
 
 chartResults <- function(chart) {
   # 2013 Edmonton Election results API: https://data.edmonton.ca/resource/ee98-x4ib

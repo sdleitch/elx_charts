@@ -55,6 +55,10 @@ loadPackages <- function() {
     install.packages("RSocrata", repos = "https://cloud.r-project.org/")
     require(RSocrata)
   }
+  if(!require(RColorBrewer)) {
+    install.packages("RcolorBrewer", repos = "https://cloud.r-project.org/")
+    require(RColorBrewer)
+  }
 }
 
 detachAllPackages()
@@ -63,31 +67,28 @@ loadPackages()
 theme_map <- function(...) {
   theme_minimal() +
   theme(
+    text=element_text(family="Helvetica", color="#22211d"),
+    plot.title=element_text(face="bold"),
     axis.line=element_blank(),
     axis.title.x=element_blank(),
     axis.text.x=element_blank(),
     axis.ticks=element_blank(),
-    panel.grid.major=element_line(color = "#ebebe5", size = 0.2),
-    panel.grid.minor=element_blank(),
-    plot.background=element_rect(fill = "#f5f5f2", color = NA),
-    panel.background=element_rect(fill = "#f5f5f2", color = NA),
-    legend.background=element_rect(fill = "#f5f5f2", color = NA),
+    panel.grid.major=element_line(color="#ebebe5", size=0.8),
+    panel.grid.minor=element_line(color="#ebebe5", size=0.4),,
+    plot.background=element_rect(fill="#f5f5f2", color=NA),
+    panel.background=element_rect(fill="#f5f5f2", color=NA),
+    legend.background=element_rect(fill="#f5f5f2", color=NA),
     panel.border=element_blank(),
   )
 }
 
-g <- ggplot(data=data.frame(), aes(
-      x=candidate_name,
-      y=votes_received,
-      fill=candidate_name
-    )) +
-    geom_bar(stat="identity") +
-    scale_y_continuous(labels = comma) +
-    scale_fill_discrete(NULL) +
-    theme_map() +
-    labs(
-      y="Votes",
-      caption="Scott Leitch, @leitchsd, 2017.")
+  g <- ggplot() +
+      scale_y_continuous(labels=comma) +
+      scale_fill_manual(NULL, values=brewer.pal(8, "Set2")) +
+      theme_map() +
+      labs(
+        y="Votes",
+        caption="A maximum of eight candidates are shown.\n\nScott Leitch, @leitchsd, 2017.")
 
 chartResults <- function(chart) {
   # 2013 Edmonton Election results API: https://data.edmonton.ca/resource/ee98-x4ib
@@ -104,15 +105,31 @@ chartResults <- function(chart) {
             reported_at=as.POSIXct(reported_at, tz="America/Edmonton", format="%A, %B %d, %Y %I:%M %p"),
             reporting=as.integer(reporting),
             votes_cast=as.integer(votes_cast),
-            votes_received=as.integer(votes_received)) %>%
+            votes_received=as.integer(votes_received),
+            candidate_name=as.factor(candidate_name)
+          ) %>%
           group_by(race_id) %>%
           dlply(.(race_id), function(x) {
-            g <- chart + labs(
+            to_chart <- head(x, 8)
+
+            g <- chart +
+            geom_bar(
+              data=to_chart,
+              mapping=aes(
+                x=reorder(candidate_name, -votes_received),
+                y=votes_received,
+                fill=candidate_name
+              ),
+              stat="identity",
+            ) +
+            labs(
               title=paste(x$contest, "-", x$ward_name),
               subtitle=paste(x$reporting, "of", x$out_of, "polls reporting as of", as.character(x$reported_at, "%I:%M %p."))
             )
-            g %+% x
+            g %+% to_chart
           })
 
   return(plots)
 }
+
+plots <- chartResults(g)

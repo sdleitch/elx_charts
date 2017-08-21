@@ -1,19 +1,18 @@
-# This script uses RSocrata: https://github.com/chicago/rsocrata
+# This code was partially adapted from an original
+# written by Timo Grossenbacher
+# (timogrossenbacher.ch) and can be be found here:
+# https://github.com/grssnbchr/thematic-maps-ggplot2
+#
+# The original code is licensed under CC-BY-SA:
+# https://creativecommons.org/licenses/by-sa/3.0/
+#
+# Any code found in this reposity is also liscensed under
+# CC-BY-SA. Enjoy!
 
 detachAllPackages <- function() {
   # This is a script to detach packges and require
   # (and install if not installed) those needed for
   # other scripts. It also adds a map theme.
-  #
-  # This code was written by Timo Grossenbacher
-  # (timogrossenbacher.ch) and can be be found here:
-  # https://github.com/grssnbchr/thematic-maps-ggplot2
-  #
-  # The original code is licensed under CC-BY-SA:
-  # https://creativecommons.org/licenses/by-sa/3.0/
-  #
-  # Any code found in this reposity is also liscensed under
-  # CC-BY-SA. Enjoy!
   basic.packages.blank <-  c("stats",
                              "graphics",
                              "grDevices",
@@ -116,6 +115,8 @@ chartResults <- function(chart) {
                               sorted[1, 2], "leads", sorted[2, 2], "by",
                               format(sorted[1,11] - sorted[2,11], big.mark=","),
                               "votes.\n", as.character(x$reported_at, "%I:%M %p"))
+            title <- paste(x$contest, "-", x$ward_name)
+
             g <- chart +
             geom_bar(
               data=to_chart,
@@ -127,13 +128,24 @@ chartResults <- function(chart) {
               stat="identity",
             ) +
             labs(
-              title=paste(x$contest, "-", x$ward_name),
+              title=title,
               subtitle=subtitle
             )
             g %+% to_chart
+            filename <- paste(gsub(" ", "", x$ward_name), ".png", sep="")
+            ggsave(filename, plot=g, device="png", path="charts/")
           })
 
   return(plots)
 }
 
-plots <- chartResults(g)
+main <- function() {
+  while(TRUE) {
+    t1 <- Sys.time()
+    plots <- chartResults(g)
+    t2 <- difftime(Sys.time(), t1)
+    if (t2 < 120) cat(paste("Sleeping for", round(120 - t2), "seconds\n")); Sys.sleep(120 - t2)
+  }
+}
+
+main()

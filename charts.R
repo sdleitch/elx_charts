@@ -74,7 +74,7 @@ theme_map <- function(...) {
     axis.text.x=element_blank(),
     axis.ticks=element_blank(),
     panel.grid.major=element_line(color="#ebebe5", size=0.8),
-    panel.grid.minor=element_line(color="#ebebe5", size=0.4),,
+    panel.grid.minor=element_line(color="#ebebe5", size=0.2),,
     plot.background=element_rect(fill="#f5f5f2", color=NA),
     panel.background=element_rect(fill="#f5f5f2", color=NA),
     legend.background=element_rect(fill="#f5f5f2", color=NA),
@@ -116,7 +116,7 @@ chartResults <- function(chart) {
             geom_bar(
               data=to_chart,
               mapping=aes(
-                x=reorder(candidate_name, -votes_received),
+                x=candidate_name,
                 y=votes_received,
                 fill=candidate_name
               ),

@@ -111,7 +111,11 @@ chartResults <- function(chart) {
           group_by(race_id) %>%
           dlply(.(race_id), function(x) {
             to_chart <- head(x, 8)
-
+            sorted <- to_chart[order(to_chart$votes_received, decreasing=T),]
+            subtitle <- paste(" With", x$reporting, "of", x$out_of, "polls reporting",
+                              sorted[1, 2], "leads", sorted[2, 2], "by",
+                              format(sorted[1,11] - sorted[2,11], big.mark=","),
+                              "votes.\n", as.character(x$reported_at, "%I:%M %p"))
             g <- chart +
             geom_bar(
               data=to_chart,
@@ -124,7 +128,7 @@ chartResults <- function(chart) {
             ) +
             labs(
               title=paste(x$contest, "-", x$ward_name),
-              subtitle=paste(x$reporting, "of", x$out_of, "polls reporting as of", as.character(x$reported_at, "%I:%M %p."))
+              subtitle=subtitle
             )
             g %+% to_chart
           })

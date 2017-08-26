@@ -43,19 +43,19 @@ loadPackages <- function() {
     require(ggplot2)
   }
   if(!require(plyr)) {
-    install.packages("plyr", repos = "https://cloud.r-project.org/")
+    install.packages("plyr", repos="https://cloud.r-project.org/")
     require(plyr)
   }
   if(!require(dplyr)) {
-    install.packages("dplyr", repos = "https://cloud.r-project.org/")
+    install.packages("dplyr", repos="https://cloud.r-project.org/")
     require(dplyr)
   }
   if(!require(RSocrata)) {
-    install.packages("RSocrata", repos = "https://cloud.r-project.org/")
+    install.packages("RSocrata")
     require(RSocrata)
   }
   if(!require(RColorBrewer)) {
-    install.packages("RcolorBrewer", repos = "https://cloud.r-project.org/")
+    install.packages("RcolorBrewer", repos="https://cloud.r-project.org/")
     require(RColorBrewer)
   }
 }

@@ -86,8 +86,7 @@ g <- ggplot() +
     scale_fill_manual(NULL, values=brewer.pal(8, "Set2")) +
     theme_map() +
     labs(
-      y="Votes",
-      caption="A maximum of eight candidates are shown.\n\nScott Leitch, @leitchsd, 2017.")
+      y="Votes")
 
 chartResults <- function(chart) {
   # 2013 Edmonton Election results API: https://data.edmonton.ca/resource/ee98-x4ib
@@ -116,7 +115,10 @@ chartResults <- function(chart) {
                               format(sorted[1,11] - sorted[2,11], big.mark=","),
                               "votes.\n", as.character(x$reported_at, "%I:%M %p"))
             title <- paste(x$contest, "-", x$ward_name)
-
+            caption <- if (nrow(x) > 8) {
+              "Only the top eight candidates are shown\n\n"
+            }
+            caption <- paste(caption, "Scott Leitch (@leitchsd), 2017")
             g <- chart +
             geom_bar(
               data=to_chart,
@@ -129,7 +131,8 @@ chartResults <- function(chart) {
             ) +
             labs(
               title=title,
-              subtitle=subtitle
+              subtitle=subtitle,
+              caption=caption
             )
             g %+% to_chart
             filename <- paste(gsub(" ", "", x$ward_name), ".png", sep="")

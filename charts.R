@@ -9,6 +9,8 @@
 # Any code found in this reposity is also liscensed under
 # CC-BY-SA. Enjoy!
 
+if(exists("APP_TOKEN")) {
+
 detachAllPackages <- function() {
   # This is a script to detach packges and require
   # (and install if not installed) those needed for
@@ -89,18 +91,17 @@ g <- ggplot() +
       y="Votes")
 
 chartResults <- function(chart) {
-  # 2013 Edmonton Election results API: https://data.edmonton.ca/resource/ee98-x4ib
+  # 2017 Edmonton Election SAMPLE results API: https://data.edmonton.ca/resource/kmp9-9v3j.json
   # This will need to be changed for LIVE RESULTS TKTK
-  response <- read.socrata("https://data.edmonton.ca/resource/ee98-x4ib.json")
-  # reported_at_datetime <- as.POSIXct(response$reported_at, tz="America/Edmonton", format="%A, %B %d, %Y %I:%M %p")
+  response <- read.socrata("https://data.edmonton.ca/resource/kmp9-9v3j.json", app_token=APP_TOKEN)
 
   plots <- tbl_df(response) %>%
            mutate(
             out_of=as.integer(out_of),
-            percentage=as.numeric(percentage),
+            percent=as.numeric(percent),
             race=as.integer(race),
             race_id=as.integer(race_id),
-            reported_at=as.POSIXct(reported_at, tz="America/Edmonton", format="%A, %B %d, %Y %I:%M %p"),
+            reported_at=as.POSIXct(reported_at, tz="America/Edmonton", format="%A, %B %d, %I:%M %p"),
             reporting=as.integer(reporting),
             votes_cast=as.integer(votes_cast),
             votes_received=as.integer(votes_received),
@@ -110,9 +111,9 @@ chartResults <- function(chart) {
           dlply(.(race_id), function(x) {
             to_chart <- head(x, 8)
             sorted <- to_chart[order(to_chart$votes_received, decreasing=T),]
-            subtitle <- paste(" With", x$reporting, "of", x$out_of, "polls reporting",
+            subtitle <- paste("With", x$reporting, "of", x$out_of, "polls reporting",
                               sorted[1, 2], "leads", sorted[2, 2], "by",
-                              format(sorted[1,11] - sorted[2,11], big.mark=","),
+                              format(sorted[1,13] - sorted[2,13], big.mark=","),
                               "votes.\n", as.character(x$reported_at, "%I:%M %p"))
             title <- paste(x$contest, "-", x$ward_name)
             caption <- if (nrow(x) > 8) {
@@ -136,7 +137,7 @@ chartResults <- function(chart) {
             )
             g %+% to_chart
             filename <- paste(gsub(" ", "", x$ward_name), ".png", sep="")
-            ggsave(filename, plot=g, device="png", path="charts/")
+            ggsave(filename, plot=g, device="png", path="charts-sample-2017/")
           })
 
   return(plots)
@@ -152,3 +153,7 @@ main <- function() {
 }
 
 main()
+
+} else {
+  print("~!~PLEASE DEFINE AN APP_TOKEN AND RELOAD~!~")
+}
